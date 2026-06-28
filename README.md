@@ -1,20 +1,71 @@
-# Pertamina Employee Health AI Prototype
+# Health AI Prototype
 
 Prototype Streamlit untuk membaca data MCU dummy, membuat profil risiko awal, dan menghasilkan rekomendasi kesehatan menggunakan LLM via OpenRouter.
 
 ## Menjalankan
 
-1. Install dependency:
+1. Install Python 3.12.x.
+
+   Kalau komputer belum punya Python, download dari:
+
+   ```text
+   https://www.python.org/downloads/
+   ```
+
+   Saat install di Windows, centang opsi **Add python.exe to PATH**. Setelah selesai, buka PowerShell baru lalu cek:
+
+   ```powershell
+   python --version
+   ```
+
+   Versi yang dipakai untuk project ini adalah Python `3.12.x`.
+
+2. Masuk ke folder project:
+
+```powershell
+cd D:\Project\Noval
+```
+
+3. Buat virtual environment dan install dependency:
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-2. Buat file `.streamlit/secrets.toml` dari `.streamlit/secrets.example.toml`, lalu isi `OPENROUTER_API_KEY`.
-   Model default yang dipakai adalah `openai/gpt-oss-120b`.
+Kalau di komputer ada beberapa versi Python, pakai launcher Python 3.12:
 
-3. Jalankan aplikasi:
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+4. Setup konfigurasi `.streamlit`.
+
+Folder `.streamlit` dipakai untuk konfigurasi Streamlit dan API key lokal. File yang boleh masuk GitHub hanya:
+
+```text
+.streamlit/config.toml
+.streamlit/secrets.example.toml
+```
+
+Buat file `.streamlit/secrets.toml` dari contoh:
+
+```powershell
+New-Item -ItemType Directory -Force .streamlit
+Copy-Item .streamlit\secrets.example.toml .streamlit\secrets.toml
+```
+
+Lalu isi `OPENROUTER_API_KEY` di `.streamlit/secrets.toml`:
+
+```toml
+OPENROUTER_API_KEY = "isi_api_key_openrouter_di_sini"
+OPENROUTER_MODEL = "openai/gpt-oss-120b"
+```
+
+Catatan: `.streamlit/secrets.toml` berisi API key asli, jadi jangan dipush ke GitHub. File ini sudah di-ignore lewat `.gitignore`.
+
+5. Jalankan aplikasi:
 
 ```powershell
 .\.venv\Scripts\python.exe -m streamlit run app.py
