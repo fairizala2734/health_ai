@@ -1,4 +1,4 @@
-# Pertamina Employee Health AI Prototype
+# Health AI Prototype
 
 Prototype Streamlit untuk membaca data MCU dummy, membuat profil risiko awal, dan menghasilkan rekomendasi kesehatan menggunakan LLM via OpenRouter.
 
