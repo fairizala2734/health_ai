@@ -1,0 +1,290 @@
+from __future__ import annotations
+
+import csv
+from datetime import datetime, timezone
+from pathlib import Path
+from zipfile import ZIP_DEFLATED, ZipFile
+from xml.sax.saxutils import escape
+
+
+CSV_OUT = Path("data/internal/dummy_mcu_karyawan_pertamina.csv")
+XLSX_OUT = Path("data/internal/dummy_mcu_karyawan_pertamina.xlsx")
+
+HEADERS = [
+    "id_karyawan",
+    "nama_dummy",
+    "usia",
+    "jenis_kelamin",
+    "unit_kerja",
+    "jenis_pekerjaan",
+    "tanggal_mcu",
+    "tinggi_badan_cm",
+    "berat_badan_kg",
+    "BMI",
+    "kategori_IMT",
+    "lingkar_perut_cm",
+    "sistolik",
+    "diastolik",
+    "nadi",
+    "SpO2",
+    "gula_darah_puasa",
+    "HbA1c",
+    "kolesterol_total",
+    "HDL",
+    "LDL",
+    "trigliserida",
+    "SGOT",
+    "SGPT",
+    "kreatinin",
+    "eGFR",
+    "asam_urat",
+    "status_EKG",
+    "status_rontgen_thorax",
+    "status_spirometri",
+    "riwayat_penyakit_pribadi",
+    "riwayat_penyakit_keluarga",
+    "obat_rutin",
+    "alergi_makanan",
+    "status_merokok",
+    "aktivitas_fisik",
+    "pola_tidur",
+    "pola_makan",
+    "keluhan",
+    "batasan_olahraga",
+    "kesimpulan_mcu",
+    "saran_dokter",
+    "segmentasi_kasus",
+    "fokus_ai",
+]
+
+
+RAW_ROWS = [
+    ["EMP001", "Karyawan 001", 29, "L", "Refinery Unit", "Lapangan", "2026-05-10", 170, 60, 78, 118, 76, 72, 98, 88, 5.2, 176, 54, 105, 95, 24, 29, 0.9, 104, 5.6, "normal", "normal", "normal", "tidak_ada", "tidak_ada", "tidak_ada", "tidak_ada", "tidak", "sedang", "cukup", "cukup_seimbang", "tidak_ada", "tidak_ada", "Fit", "Pertahankan aktivitas fisik dan pola makan.", "normal_tanpa_riwayat", "maintenance_kebugaran"],
+    ["EMP002", "Karyawan 002", 34, "P", "Head Office", "Kantor", "2026-05-11", 158, 53, 72, 110, 70, 76, 99, 84, 5.1, 165, 58, 92, 85, 19, 21, 0.7, 112, 4.1, "normal", "normal", "normal", "tidak_ada", "diabetes", "tidak_ada", "tidak_ada", "tidak", "rendah", "kurang", "sering_minuman_manis", "mengantuk_siang", "tidak_ada", "Fit", "Perbaiki tidur dan aktivitas rutin.", "normal_tanpa_riwayat", "maintenance_dengan_perbaikan_lifestyle"],
+    ["EMP003", "Karyawan 003", 41, "L", "Marketing", "Kantor", "2026-05-12", 172, 67, 88, 122, 78, 74, 98, 91, 5.3, 188, 47, 118, 120, 28, 34, 1.0, 96, 6.2, "normal", "normal", "normal", "tidak_ada", "hipertensi", "tidak_ada", "tidak_ada", "pernah", "rendah", "cukup", "sering_gorengan", "tidak_ada", "tidak_ada", "Fit", "Jaga berat badan dan kurangi makanan tinggi lemak.", "normal_tanpa_riwayat", "maintenance_cegah_risiko_metabolik"],
+    ["EMP004", "Karyawan 004", 25, "P", "Finance", "Kantor", "2026-05-13", 162, 57, 74, 116, 72, 80, 99, 86, 5.1, 172, 60, 98, 88, 18, 20, 0.8, 110, 3.8, "normal", "normal", "normal", "tidak_ada", "tidak_ada", "tidak_ada", "seafood", "tidak", "sedang", "cukup", "cukup_seimbang", "tidak_ada", "tidak_ada", "Fit", "Pertahankan kebiasaan sehat.", "normal_tanpa_riwayat", "maintenance_umum"],
+    ["EMP005", "Karyawan 005", 38, "L", "IT", "Kantor", "2026-05-14", 168, 64, 86, 124, 82, 78, 98, 96, 5.5, 198, 43, 128, 148, 32, 39, 1.0, 98, 6.8, "normal", "normal", "normal", "tidak_ada", "jantung", "tidak_ada", "tidak_ada", "tidak", "rendah", "kurang", "sering_lembur_dan_snack", "mudah_lelah", "tidak_ada", "Fit with note", "Tingkatkan aktivitas bertahap dan evaluasi lipid.", "normal_tanpa_riwayat", "maintenance_dengan_risiko_lifestyle"],
+    ["EMP006", "Karyawan 006", 45, "L", "Refinery Unit", "Lapangan", "2026-05-15", 169, 65, 91, 138, 88, 76, 98, 97, 5.4, 196, 46, 126, 145, 30, 36, 1.0, 94, 6.0, "normal", "normal", "normal", "hipertensi", "hipertensi", "amlodipine", "tidak_ada", "tidak", "sedang", "cukup", "cukup_seimbang", "tidak_ada", "hindari_intensitas_tinggi", "Fit with note", "Pantau tekanan darah dan batasi aktivitas intensitas tinggi.", "normal_dengan_riwayat", "kontrol_tekanan_darah_dan_maintenance"],
+    ["EMP007", "Karyawan 007", 50, "P", "HSE", "Kantor", "2026-05-16", 155, 53, 82, 126, 78, 72, 99, 118, 6.7, 190, 52, 116, 130, 25, 28, 0.8, 100, 4.9, "normal", "normal", "normal", "diabetes", "diabetes", "metformin", "tidak_ada", "tidak", "rendah", "cukup", "karbohidrat_tinggi", "tidak_ada", "perhatikan_gula_darah", "Fit with note", "Kontrol gula darah dan perbaiki pola makan.", "normal_dengan_riwayat", "kontrol_gula_darah_tanpa_turun_berat_agresif"],
+    ["EMP008", "Karyawan 008", 47, "L", "Marine", "Lapangan", "2026-05-17", 175, 69, 88, 124, 80, 70, 97, 94, 5.4, 242, 39, 168, 190, 34, 42, 1.0, 92, 7.0, "normal", "normal", "normal", "kolesterol_tinggi", "jantung", "atorvastatin", "tidak_ada", "pernah", "sedang", "kurang", "sering_gorengan", "tidak_ada", "tidak_ada", "Fit with note", "Evaluasi profil lipid dan kurangi lemak jenuh.", "normal_dengan_riwayat", "kontrol_lipid_dan_kebugaran"],
+    ["EMP009", "Karyawan 009", 32, "P", "Admin", "Kantor", "2026-05-18", 160, 57, 77, 112, 72, 84, 98, 88, 5.2, 170, 55, 98, 86, 20, 22, 0.7, 108, 4.4, "normal", "normal", "normal", "asma", "asma", "inhaler_prn", "debu", "tidak", "rendah", "cukup", "cukup_seimbang", "sesak_saat_aktivitas_berat", "hindari_trigger_asma", "Fit with note", "Olahraga bertahap dan perhatikan gejala sesak.", "normal_dengan_riwayat", "maintenance_dengan_batasan_paru"],
+    ["EMP010", "Karyawan 010", 39, "L", "Maintenance", "Lapangan", "2026-05-19", 173, 68, 89, 120, 78, 74, 98, 90, 5.3, 184, 48, 112, 115, 27, 30, 1.0, 96, 5.9, "normal", "normal", "normal", "cedera_lutut", "tidak_ada", "tidak_ada", "tidak_ada", "tidak", "sedang", "cukup", "cukup_seimbang", "nyeri_lutut_kadang", "hindari_lari_dan_lompat", "Fit with note", "Pilih latihan low impact.", "normal_dengan_riwayat", "maintenance_low_impact"],
+    ["EMP011", "Karyawan 011", 44, "P", "HR", "Kantor", "2026-05-20", 157, 55, 84, 122, 78, 78, 98, 92, 5.4, 205, 44, 135, 155, 24, 27, 0.8, 104, 5.1, "normal", "normal", "normal", "hipotiroid", "diabetes", "levothyroxine", "tidak_ada", "tidak", "rendah", "kurang", "porsi_tidak_teratur", "mudah_lelah", "tidak_ada", "Fit with note", "Konsisten minum obat dan perbaiki aktivitas.", "normal_dengan_riwayat", "maintenance_dengan_monitor_metabolik"],
+    ["EMP012", "Karyawan 012", 36, "L", "Pipeline", "Lapangan", "2026-05-21", 170, 68, 87, 122, 80, 76, 98, 92, 5.4, 192, 45, 120, 150, 28, 35, 1.0, 96, 6.4, "normal", "normal", "normal", "tidak_ada", "hipertensi", "tidak_ada", "tidak_ada", "aktif", "rendah", "kurang", "sering_minuman_manis", "tidak_ada", "tidak_ada", "Fit", "Turunkan risiko metabolik melalui aktivitas dan makan.", "overweight_tanpa_riwayat", "turun_berat_ringan_dan_cegah_obesitas"],
+    ["EMP013", "Karyawan 013", 30, "P", "Finance", "Kantor", "2026-05-22", 160, 60, 86, 116, 74, 82, 99, 88, 5.2, 178, 55, 104, 98, 20, 22, 0.7, 110, 4.6, "normal", "normal", "normal", "tidak_ada", "tidak_ada", "tidak_ada", "tidak_ada", "tidak", "rendah", "cukup", "sering_snack_manis", "tidak_ada", "tidak_ada", "Fit", "Mulai aktivitas rutin dan kontrol snack.", "overweight_tanpa_riwayat", "turun_berat_ringan"],
+    ["EMP014", "Karyawan 014", 42, "L", "Refinery Unit", "Lapangan", "2026-05-23", 176, 76, 96, 128, 82, 76, 98, 95, 5.5, 210, 40, 140, 170, 32, 41, 1.1, 88, 7.1, "normal", "normal", "normal", "tidak_ada", "asam_urat", "tidak_ada", "tidak_ada", "pernah", "sedang", "cukup", "sering_gorengan", "tidak_ada", "tidak_ada", "Fit with note", "Kurangi lemak jenuh dan pantau asam urat.", "overweight_tanpa_riwayat", "turun_berat_ringan_dengan_kontrol_lipid"],
+    ["EMP015", "Karyawan 015", 27, "L", "IT", "Kantor", "2026-05-24", 165, 65, 89, 118, 76, 78, 99, 90, 5.3, 182, 49, 108, 105, 22, 26, 0.9, 108, 5.4, "normal", "normal", "normal", "tidak_ada", "tidak_ada", "tidak_ada", "tidak_ada", "tidak", "rendah", "kurang", "makan_malam_berlebih", "tidak_ada", "tidak_ada", "Fit", "Atur porsi dan tambah latihan kekuatan ringan.", "overweight_tanpa_riwayat", "turun_berat_ringan_dan_bangun_kebiasaan"],
+    ["EMP016", "Karyawan 016", 48, "P", "Procurement", "Kantor", "2026-05-25", 154, 58, 88, 126, 80, 80, 98, 99, 5.6, 202, 45, 132, 160, 28, 32, 0.8, 100, 5.8, "normal", "normal", "normal", "tidak_ada", "jantung", "tidak_ada", "tidak_ada", "tidak", "rendah", "cukup", "sering_gorengan", "tidak_ada", "tidak_ada", "Fit", "Kontrol pola makan dan tingkatkan jalan kaki.", "overweight_tanpa_riwayat", "turun_berat_ringan_dengan_cegah_lipid"],
+    ["EMP017", "Karyawan 017", 46, "L", "Operations", "Lapangan", "2026-05-26", 170, 70, 95, 142, 90, 76, 98, 98, 5.6, 210, 42, 138, 160, 31, 39, 1.0, 94, 6.3, "normal", "normal", "normal", "hipertensi", "hipertensi", "amlodipine", "tidak_ada", "tidak", "rendah", "kurang", "tinggi_garam", "tidak_ada", "hindari_intensitas_tinggi", "Fit with note", "Pantau tekanan darah dan turunkan berat bertahap.", "overweight_dengan_riwayat", "turun_berat_aman_dengan_kontrol_tekanan_darah"],
+    ["EMP018", "Karyawan 018", 52, "P", "Admin", "Kantor", "2026-05-27", 158, 61, 90, 130, 82, 78, 99, 124, 7.0, 198, 50, 122, 148, 25, 28, 0.8, 98, 5.2, "normal", "normal", "normal", "diabetes", "diabetes", "metformin", "tidak_ada", "tidak", "rendah", "cukup", "karbohidrat_tinggi", "tidak_ada", "perhatikan_gula_darah", "Fit with note", "Kontrol gula dan aktivitas low impact.", "overweight_dengan_riwayat", "turun_berat_aman_dengan_kontrol_gula"],
+    ["EMP019", "Karyawan 019", 43, "L", "Maintenance", "Lapangan", "2026-05-28", 172, 72, 97, 124, 80, 74, 98, 92, 5.4, 218, 41, 145, 178, 30, 36, 1.1, 92, 8.2, "normal", "normal", "normal", "asam_urat", "asam_urat", "allopurinol", "seafood", "pernah", "sedang", "cukup", "tinggi_purin", "nyeri_sendiri_kadang", "hindari_lari_saat_nyeri", "Fit with note", "Batasi purin dan hidrasi cukup.", "overweight_dengan_riwayat", "turun_berat_dengan_kontrol_asam_urat"],
+    ["EMP020", "Karyawan 020", 37, "P", "Legal", "Kantor", "2026-05-29", 162, 64, 89, 120, 78, 86, 98, 90, 5.4, 186, 56, 110, 100, 20, 23, 0.7, 108, 4.2, "normal", "normal", "normal", "cedera_lutut", "tidak_ada", "tidak_ada", "tidak_ada", "tidak", "rendah", "kurang", "sering_snack", "nyeri_lutut", "hindari_lari_lompat_squat_berat", "Fit with note", "Turunkan berat dengan aktivitas low impact.", "overweight_dengan_riwayat", "turun_berat_low_impact"],
+    ["EMP021", "Karyawan 021", 40, "L", "Marine", "Lapangan", "2026-05-30", 174, 74, 98, 126, 80, 78, 97, 94, 5.5, 190, 48, 116, 135, 26, 31, 1.0, 96, 5.7, "normal", "normal", "mild_obstructive", "asma", "asma", "inhaler_prn", "debu", "aktif", "rendah", "cukup", "cukup_seimbang", "sesak_saat_debu", "hindari_trigger_asma", "Fit with note", "Latihan bertahap dan kontrol gejala asma.", "overweight_dengan_riwayat", "turun_berat_dengan_batasan_paru"],
+    ["EMP022", "Karyawan 022", 49, "L", "Security", "Shift", "2026-05-31", 168, 69, 94, 136, 86, 76, 98, 108, 6.1, 226, 38, 154, 185, 36, 46, 1.1, 86, 7.0, "normal", "normal", "normal", "kolesterol_tinggi", "jantung", "atorvastatin", "tidak_ada", "pernah", "rendah", "kurang", "sering_makan_malam_shift", "mudah_lelah", "hindari_intensitas_tinggi_awal", "Fit with note", "Perbaiki lipid, tidur, dan pola makan saat shift.", "overweight_dengan_riwayat", "turun_berat_dengan_kontrol_lipid_dan_shift"],
+    ["EMP023", "Karyawan 023", 54, "P", "Finance", "Kantor", "2026-06-01", 156, 60, 92, 144, 88, 78, 98, 116, 6.4, 212, 46, 138, 165, 24, 28, 0.9, 92, 5.6, "normal", "normal", "normal", "hipertensi;prediabetes", "diabetes", "amlodipine", "tidak_ada", "tidak", "rendah", "cukup", "tinggi_karbohidrat_dan_garam", "tidak_ada", "hindari_intensitas_tinggi", "Fit with note", "Kontrol tekanan darah dan gula secara berkala.", "overweight_dengan_riwayat", "turun_berat_aman_dengan_kontrol_bp_gula"],
+    ["EMP024", "Karyawan 024", 35, "L", "Engineering", "Kantor", "2026-06-02", 180, 80, 96, 122, 78, 74, 98, 93, 5.4, 192, 45, 124, 145, 29, 37, 1.0, 96, 6.0, "normal", "normal", "normal", "GERD", "tidak_ada", "omeprazole_prn", "pedas", "tidak", "rendah", "kurang", "makan_tidak_teratur", "nyeri_ulu_hati_kadang", "hindari_makan_berat_sebelum_olahraga", "Fit", "Atur jadwal makan dan mulai aktivitas rutin.", "overweight_dengan_riwayat", "turun_berat_dengan_penyesuaian_pola_makan"],
+    ["EMP025", "Karyawan 025", 31, "L", "IT", "Kantor", "2026-06-03", 170, 76, 98, 126, 82, 80, 98, 96, 5.5, 210, 42, 138, 172, 34, 44, 1.0, 96, 6.8, "normal", "normal", "normal", "tidak_ada", "hipertensi", "tidak_ada", "tidak_ada", "tidak", "rendah", "kurang", "sering_snack_dan_gorengan", "tidak_ada", "tidak_ada", "Fit with note", "Turunkan berat dan evaluasi lipid.", "obesitas_tanpa_riwayat", "turun_berat_bertahap"],
+    ["EMP026", "Karyawan 026", 29, "P", "Admin", "Kantor", "2026-06-04", 158, 65, 94, 118, 76, 82, 99, 90, 5.3, 184, 52, 108, 125, 21, 24, 0.7, 110, 4.7, "normal", "normal", "normal", "tidak_ada", "tidak_ada", "tidak_ada", "tidak_ada", "tidak", "rendah", "cukup", "sering_minuman_manis", "tidak_ada", "tidak_ada", "Fit", "Mulai defisit ringan dan aktivitas harian.", "obesitas_tanpa_riwayat", "turun_berat_dengan_kebiasaan_harian"],
+    ["EMP027", "Karyawan 027", 44, "L", "Refinery Unit", "Lapangan", "2026-06-05", 175, 86, 103, 132, 84, 78, 98, 100, 5.7, 218, 40, 146, 190, 38, 52, 1.1, 88, 7.4, "normal", "normal", "normal", "tidak_ada", "diabetes", "tidak_ada", "tidak_ada", "pernah", "rendah", "kurang", "tinggi_gorengan", "mudah_lelah", "tidak_ada", "Fit with note", "Turunkan berat dan pantau tekanan/lipid.", "obesitas_tanpa_riwayat", "turun_berat_dengan_monitor_risiko"],
+    ["EMP028", "Karyawan 028", 39, "P", "HR", "Kantor", "2026-06-06", 160, 73, 99, 124, 80, 84, 98, 92, 5.4, 196, 46, 124, 150, 25, 30, 0.8, 102, 5.3, "normal", "normal", "normal", "tidak_ada", "tidak_ada", "tidak_ada", "tidak_ada", "tidak", "rendah", "kurang", "porsi_besar", "tidak_ada", "tidak_ada", "Fit", "Program penurunan berat bertahap.", "obesitas_tanpa_riwayat", "turun_berat_bertahap_dan_strength_ringan"],
+    ["EMP029", "Karyawan 029", 33, "L", "Pipeline", "Lapangan", "2026-06-07", 168, 78, 100, 128, 82, 76, 98, 94, 5.5, 204, 44, 132, 160, 31, 40, 1.0, 96, 6.5, "normal", "normal", "normal", "tidak_ada", "hipertensi", "tidak_ada", "tidak_ada", "aktif", "sedang", "cukup", "tinggi_kalori", "tidak_ada", "tidak_ada", "Fit with note", "Kurangi rokok dan turunkan berat.", "obesitas_tanpa_riwayat", "turun_berat_dengan_pengurangan_risiko"],
+    ["EMP030", "Karyawan 030", 51, "L", "Operations", "Lapangan", "2026-06-08", 170, 82, 108, 152, 94, 78, 97, 112, 6.3, 230, 38, 158, 210, 42, 56, 1.2, 78, 7.8, "normal", "normal", "normal", "hipertensi", "hipertensi;jantung", "amlodipine", "tidak_ada", "pernah", "rendah", "kurang", "tinggi_garam_dan_gorengan", "pusing_kadang", "hindari_intensitas_tinggi", "Fit with note", "Kontrol tekanan darah sebelum peningkatan aktivitas.", "obesitas_dengan_riwayat", "turun_berat_sangat_bertahap_dengan_kontrol_bp"],
+    ["EMP031", "Karyawan 031", 55, "P", "Admin", "Kantor", "2026-06-09", 155, 72, 105, 138, 86, 76, 98, 136, 7.8, 220, 46, 142, 182, 30, 36, 0.9, 86, 5.9, "normal", "normal", "normal", "diabetes", "diabetes", "metformin", "tidak_ada", "tidak", "rendah", "cukup", "tinggi_karbohidrat", "mudah_lelah", "perhatikan_gula_darah", "Fit with note", "Kontrol gula dan turunkan berat secara aman.", "obesitas_dengan_riwayat", "turun_berat_dengan_kontrol_diabetes"],
+    ["EMP032", "Karyawan 032", 48, "L", "Maintenance", "Lapangan", "2026-06-10", 172, 91, 111, 146, 90, 80, 97, 118, 6.5, 238, 36, 165, 220, 44, 62, 1.1, 84, 8.8, "normal", "normal", "normal", "hipertensi;asam_urat", "hipertensi", "amlodipine;allopurinol", "seafood", "aktif", "rendah", "kurang", "tinggi_purin_dan_garam", "nyeri_sendiri_kadang", "hindari_lari_saat_nyeri", "Fit with note", "Kontrol tekanan darah, asam urat, dan berat badan.", "obesitas_dengan_riwayat", "turun_berat_dengan_batasan_bp_asam_urat"],
+    ["EMP033", "Karyawan 033", 46, "P", "HSE", "Kantor", "2026-06-11", 160, 79, 103, 132, 84, 84, 98, 102, 5.8, 232, 39, 156, 200, 36, 48, 1.0, 90, 5.4, "normal", "normal", "normal", "kolesterol_tinggi;cedera_lutut", "jantung", "atorvastatin", "tidak_ada", "tidak", "rendah", "kurang", "sering_gorengan", "nyeri_lutut", "hindari_lari_lompat_squat_berat", "Fit with note", "Pilih low impact dan kontrol lipid.", "obesitas_dengan_riwayat", "turun_berat_low_impact_dengan_kontrol_lipid"],
+    ["EMP034", "Karyawan 034", 58, "L", "Marine", "Lapangan", "2026-06-12", 168, 88, 110, 134, 86, 82, 96, 98, 5.6, 200, 45, 128, 160, 29, 34, 1.0, 88, 6.1, "normal", "normal", "mild_obstructive", "asma", "asma", "inhaler_prn", "debu", "pernah", "rendah", "cukup", "porsi_besar", "sesak_saat_aktivitas_berat", "hindari_trigger_asma", "Fit with note", "Mulai aktivitas low impact dan bertahap.", "obesitas_dengan_riwayat", "turun_berat_dengan_batasan_paru"],
+    ["EMP035", "Karyawan 035", 53, "L", "Refinery Unit", "Lapangan", "2026-06-13", 173, 94, 115, 148, 92, 78, 98, 108, 6.1, 226, 40, 150, 210, 55, 74, 1.3, 62, 7.2, "borderline", "normal", "normal", "penyakit_ginjal;hipertensi", "hipertensi", "amlodipine", "tidak_ada", "tidak", "rendah", "kurang", "tinggi_garam", "mudah_lelah", "hindari_protein_berlebih_dan_intensitas_tinggi", "Fit with note", "Perlu follow-up fungsi ginjal dan tekanan darah.", "obesitas_dengan_riwayat", "turun_berat_konservatif_dengan_batasan_ginjal"],
+    ["EMP036", "Karyawan 036", 57, "P", "Finance", "Kantor", "2026-06-14", 156, 78, 108, 150, 92, 82, 98, 130, 7.4, 240, 38, 166, 225, 34, 42, 1.0, 80, 6.0, "normal", "normal", "normal", "hipertensi;diabetes", "diabetes;jantung", "amlodipine;metformin", "tidak_ada", "tidak", "rendah", "kurang", "tinggi_karbohidrat_dan_garam", "mudah_lelah", "hindari_intensitas_tinggi", "Fit with note", "Prioritaskan kontrol tekanan darah dan gula.", "obesitas_dengan_riwayat", "turun_berat_sangat_bertahap_dengan_kontrol_bp_gula"],
+    ["EMP037", "Karyawan 037", 60, "L", "Security", "Shift", "2026-06-15", 170, 98, 118, 156, 96, 84, 97, 106, 6.0, 218, 42, 140, 190, 32, 44, 1.1, 82, 6.7, "old_infarct_suspect", "normal", "normal", "penyakit_jantung", "jantung", "bisoprolol;aspirin", "tidak_ada", "pernah", "rendah", "kurang", "makan_tidak_teratur_shift", "mudah_lelah", "perlu_supervisi_medis", "Perlu follow-up", "Konsultasi tenaga kesehatan sebelum program olahraga.", "obesitas_dengan_riwayat", "kontrol_risiko_tinggi_dengan_supervisi"],
+    ["EMP038", "Karyawan 038", 28, "P", "Admin", "Kantor", "2026-06-16", 162, 47, 68, 108, 68, 82, 99, 82, 5.0, 158, 62, 82, 70, 18, 20, 0.7, 112, 3.6, "normal", "normal", "normal", "tidak_ada", "tidak_ada", "tidak_ada", "tidak_ada", "tidak", "rendah", "kurang", "sering_telat_makan", "mudah_lelah", "tidak_ada", "Fit", "Naikkan asupan sehat dan strength ringan.", "underweight_tanpa_riwayat", "naik_berat_sehat"],
+    ["EMP039", "Karyawan 039", 35, "L", "IT", "Kantor", "2026-06-17", 176, 56, 74, 116, 74, 78, 98, 86, 5.1, 164, 56, 90, 80, 21, 24, 0.9, 108, 4.8, "normal", "normal", "normal", "tidak_ada", "tidak_ada", "tidak_ada", "tidak_ada", "tidak", "rendah", "kurang", "kurang_protein", "tidak_ada", "tidak_ada", "Fit", "Tambah kalori berkualitas dan latihan kekuatan.", "underweight_tanpa_riwayat", "naik_massa_tubuh_sehat"],
+    ["EMP040", "Karyawan 040", 42, "P", "HR", "Kantor", "2026-06-18", 158, 45, 70, 110, 70, 86, 99, 84, 5.1, 170, 58, 96, 85, 20, 22, 0.7, 106, 4.0, "normal", "normal", "normal", "anemia", "tidak_ada", "zat_besi", "tidak_ada", "tidak", "rendah", "kurang", "porsi_kecil", "mudah_lelah", "hindari_intensitas_tinggi_awal", "Fit with note", "Evaluasi anemia dan naikkan asupan.", "underweight_dengan_riwayat", "naik_berat_dengan_monitor_energi_anemia"],
+]
+
+
+def bmi_category(bmi: float) -> str:
+    if bmi < 18.5:
+        return "underweight"
+    if bmi < 23:
+        return "normal"
+    if bmi < 25:
+        return "overweight"
+    if bmi < 30:
+        return "obesitas_I"
+    return "obesitas_II"
+
+
+def build_rows() -> list[dict[str, str | int | float]]:
+    rows = []
+    for raw in RAW_ROWS:
+        height_m = raw[7] / 100
+        bmi = round(raw[8] / (height_m * height_m), 1)
+        row_values = [
+            *raw[:9],
+            bmi,
+            bmi_category(bmi),
+            *raw[9:],
+        ]
+        rows.append(dict(zip(HEADERS, row_values, strict=True)))
+    return rows
+
+
+def write_csv(rows: list[dict[str, str | int | float]]) -> None:
+    CSV_OUT.parent.mkdir(parents=True, exist_ok=True)
+    with CSV_OUT.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=HEADERS)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def col_name(index: int) -> str:
+    name = ""
+    while index:
+        index, rem = divmod(index - 1, 26)
+        name = chr(65 + rem) + name
+    return name
+
+
+def sheet_xml(rows: list[list[object]]) -> str:
+    xml_rows = []
+    for r_idx, row in enumerate(rows, start=1):
+        cells = []
+        for c_idx, value in enumerate(row, start=1):
+            ref = f"{col_name(c_idx)}{r_idx}"
+            text = escape(str(value))
+            cells.append(f'<c r="{ref}" t="inlineStr"><is><t>{text}</t></is></c>')
+        xml_rows.append(f'<row r="{r_idx}">{"".join(cells)}</row>')
+    return (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
+        'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+        '<sheetViews><sheetView workbookViewId="0"/></sheetViews>'
+        '<sheetFormatPr defaultRowHeight="15"/>'
+        f'<sheetData>{"".join(xml_rows)}</sheetData>'
+        '</worksheet>'
+    )
+
+
+def write_xlsx(rows: list[dict[str, str | int | float]]) -> None:
+    XLSX_OUT.parent.mkdir(parents=True, exist_ok=True)
+    dummy_rows = [HEADERS] + [[row[h] for h in HEADERS] for row in rows]
+    summary_rows = [
+        ["kategori", "jumlah"],
+        *sorted(
+            [
+                [key, sum(1 for row in rows if row["segmentasi_kasus"] == key)]
+                for key in {str(row["segmentasi_kasus"]) for row in rows}
+            ]
+        ),
+    ]
+    imt_rows = [
+        ["kategori_IMT", "jumlah"],
+        *sorted(
+            [
+                [key, sum(1 for row in rows if row["kategori_IMT"] == key)]
+                for key in {str(row["kategori_IMT"]) for row in rows}
+            ]
+        ),
+    ]
+    dictionary_rows = [
+        ["field", "keterangan"],
+        ["kategori_IMT", "Menggunakan batas Asia-Pacific: underweight <18.5, normal 18.5-22.9, overweight 23-24.9, obesitas_I 25-29.9, obesitas_II >=30."],
+        ["segmentasi_kasus", "Label skenario utama untuk menguji AI recommendation engine."],
+        ["fokus_ai", "Arah rekomendasi yang diharapkan dari AI untuk karyawan tersebut."],
+        ["kesimpulan_mcu", "Ringkasan hasil MCU dari tenaga kesehatan; harus menjadi baseline klinis."],
+        ["saran_dokter", "Saran tenaga kesehatan yang perlu diprioritaskan oleh sistem."],
+    ]
+    sheets = {
+        "Dummy_MCU": dummy_rows,
+        "Ringkasan_Segmentasi": summary_rows,
+        "Ringkasan_IMT": imt_rows,
+        "Kamus": dictionary_rows,
+    }
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    sheet_names = list(sheets)
+    with ZipFile(XLSX_OUT, "w", ZIP_DEFLATED) as z:
+        z.writestr(
+            "[Content_Types].xml",
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+            '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+            '<Default Extension="xml" ContentType="application/xml"/>'
+            '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+            '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>'
+            '<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>'
+            + "".join(
+                f'<Override PartName="/xl/worksheets/sheet{i}.xml" '
+                'ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'
+                for i in range(1, len(sheet_names) + 1)
+            )
+            + "</Types>",
+        )
+        z.writestr(
+            "_rels/.rels",
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+            '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>'
+            '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>'
+            '<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>'
+            "</Relationships>",
+        )
+        z.writestr(
+            "docProps/core.xml",
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            '<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" '
+            'xmlns:dc="http://purl.org/dc/elements/1.1/" '
+            'xmlns:dcterms="http://purl.org/dc/terms/" '
+            'xmlns:dcmitype="http://purl.org/dc/dcmitype/" '
+            'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
+            "<dc:creator>Codex</dc:creator>"
+            "<cp:lastModifiedBy>Codex</cp:lastModifiedBy>"
+            f'<dcterms:created xsi:type="dcterms:W3CDTF">{now}</dcterms:created>'
+            f'<dcterms:modified xsi:type="dcterms:W3CDTF">{now}</dcterms:modified>'
+            "</cp:coreProperties>",
+        )
+        z.writestr(
+            "docProps/app.xml",
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            '<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" '
+            'xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">'
+            "<Application>Codex</Application>"
+            "</Properties>",
+        )
+        z.writestr(
+            "xl/workbook.xml",
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
+            'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+            "<sheets>"
+            + "".join(
+                f'<sheet name="{escape(name)}" sheetId="{i}" r:id="rId{i}"/>'
+                for i, name in enumerate(sheet_names, start=1)
+            )
+            + "</sheets></workbook>",
+        )
+        z.writestr(
+            "xl/_rels/workbook.xml.rels",
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+            + "".join(
+                f'<Relationship Id="rId{i}" '
+                'Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" '
+                f'Target="worksheets/sheet{i}.xml"/>'
+                for i in range(1, len(sheet_names) + 1)
+            )
+            + "</Relationships>",
+        )
+        for i, name in enumerate(sheet_names, start=1):
+            z.writestr(f"xl/worksheets/sheet{i}.xml", sheet_xml(sheets[name]))
+
+
+def main() -> None:
+    rows = build_rows()
+    write_csv(rows)
+    write_xlsx(rows)
+    print(CSV_OUT.resolve())
+    print(XLSX_OUT.resolve())
+
+
+if __name__ == "__main__":
+    main()

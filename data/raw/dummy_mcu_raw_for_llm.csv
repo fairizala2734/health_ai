@@ -1,0 +1,41 @@
+id_karyawan,nama_dummy,usia,jenis_kelamin,unit_kerja,jenis_pekerjaan,tanggal_mcu,tinggi_badan_cm,berat_badan_kg,BMI,lingkar_perut_cm,sistolik,diastolik,nadi,SpO2,gula_darah_puasa,HbA1c,kolesterol_total,HDL,LDL,trigliserida,SGOT,SGPT,kreatinin,eGFR,asam_urat,status_EKG,status_rontgen_thorax,status_spirometri,riwayat_penyakit_pribadi,riwayat_penyakit_keluarga,obat_rutin,alergi_makanan,status_merokok
+EMP001,Karyawan 001,29,L,Refinery Unit,Lapangan,2026-05-10,170,60,20.8,78,118,76,72,98,88,5.2,176,54,105,95,24,29,0.9,104,5.6,normal,normal,normal,tidak_ada,tidak_ada,tidak_ada,tidak_ada,tidak
+EMP002,Karyawan 002,34,P,Head Office,Kantor,2026-05-11,158,53,21.2,72,110,70,76,99,84,5.1,165,58,92,85,19,21,0.7,112,4.1,normal,normal,normal,tidak_ada,diabetes,tidak_ada,tidak_ada,tidak
+EMP003,Karyawan 003,41,L,Marketing,Kantor,2026-05-12,172,67,22.6,88,122,78,74,98,91,5.3,188,47,118,120,28,34,1.0,96,6.2,normal,normal,normal,tidak_ada,hipertensi,tidak_ada,tidak_ada,pernah
+EMP004,Karyawan 004,25,P,Finance,Kantor,2026-05-13,162,57,21.7,74,116,72,80,99,86,5.1,172,60,98,88,18,20,0.8,110,3.8,normal,normal,normal,tidak_ada,tidak_ada,tidak_ada,seafood,tidak
+EMP005,Karyawan 005,38,L,IT,Kantor,2026-05-14,168,64,22.7,86,124,82,78,98,96,5.5,198,43,128,148,32,39,1.0,98,6.8,normal,normal,normal,tidak_ada,jantung,tidak_ada,tidak_ada,tidak
+EMP006,Karyawan 006,45,L,Refinery Unit,Lapangan,2026-05-15,169,65,22.8,91,138,88,76,98,97,5.4,196,46,126,145,30,36,1.0,94,6.0,normal,normal,normal,hipertensi,hipertensi,amlodipine,tidak_ada,tidak
+EMP007,Karyawan 007,50,P,HSE,Kantor,2026-05-16,155,53,22.1,82,126,78,72,99,118,6.7,190,52,116,130,25,28,0.8,100,4.9,normal,normal,normal,diabetes,diabetes,metformin,tidak_ada,tidak
+EMP008,Karyawan 008,47,L,Marine,Lapangan,2026-05-17,175,69,22.5,88,124,80,70,97,94,5.4,242,39,168,190,34,42,1.0,92,7.0,normal,normal,normal,kolesterol_tinggi,jantung,atorvastatin,tidak_ada,pernah
+EMP009,Karyawan 009,32,P,Admin,Kantor,2026-05-18,160,57,22.3,77,112,72,84,98,88,5.2,170,55,98,86,20,22,0.7,108,4.4,normal,normal,normal,asma,asma,inhaler_prn,debu,tidak
+EMP010,Karyawan 010,39,L,Maintenance,Lapangan,2026-05-19,173,68,22.7,89,120,78,74,98,90,5.3,184,48,112,115,27,30,1.0,96,5.9,normal,normal,normal,cedera_lutut,tidak_ada,tidak_ada,tidak_ada,tidak
+EMP011,Karyawan 011,44,P,HR,Kantor,2026-05-20,157,55,22.3,84,122,78,78,98,92,5.4,205,44,135,155,24,27,0.8,104,5.1,normal,normal,normal,hipotiroid,diabetes,levothyroxine,tidak_ada,tidak
+EMP012,Karyawan 012,36,L,Pipeline,Lapangan,2026-05-21,170,68,23.5,87,122,80,76,98,92,5.4,192,45,120,150,28,35,1.0,96,6.4,normal,normal,normal,tidak_ada,hipertensi,tidak_ada,tidak_ada,aktif
+EMP013,Karyawan 013,30,P,Finance,Kantor,2026-05-22,160,60,23.4,86,116,74,82,99,88,5.2,178,55,104,98,20,22,0.7,110,4.6,normal,normal,normal,tidak_ada,tidak_ada,tidak_ada,tidak_ada,tidak
+EMP014,Karyawan 014,42,L,Refinery Unit,Lapangan,2026-05-23,176,76,24.5,96,128,82,76,98,95,5.5,210,40,140,170,32,41,1.1,88,7.1,normal,normal,normal,tidak_ada,asam_urat,tidak_ada,tidak_ada,pernah
+EMP015,Karyawan 015,27,L,IT,Kantor,2026-05-24,165,65,23.9,89,118,76,78,99,90,5.3,182,49,108,105,22,26,0.9,108,5.4,normal,normal,normal,tidak_ada,tidak_ada,tidak_ada,tidak_ada,tidak
+EMP016,Karyawan 016,48,P,Procurement,Kantor,2026-05-25,154,58,24.5,88,126,80,80,98,99,5.6,202,45,132,160,28,32,0.8,100,5.8,normal,normal,normal,tidak_ada,jantung,tidak_ada,tidak_ada,tidak
+EMP017,Karyawan 017,46,L,Operations,Lapangan,2026-05-26,170,70,24.2,95,142,90,76,98,98,5.6,210,42,138,160,31,39,1.0,94,6.3,normal,normal,normal,hipertensi,hipertensi,amlodipine,tidak_ada,tidak
+EMP018,Karyawan 018,52,P,Admin,Kantor,2026-05-27,158,61,24.4,90,130,82,78,99,124,7.0,198,50,122,148,25,28,0.8,98,5.2,normal,normal,normal,diabetes,diabetes,metformin,tidak_ada,tidak
+EMP019,Karyawan 019,43,L,Maintenance,Lapangan,2026-05-28,172,72,24.3,97,124,80,74,98,92,5.4,218,41,145,178,30,36,1.1,92,8.2,normal,normal,normal,asam_urat,asam_urat,allopurinol,seafood,pernah
+EMP020,Karyawan 020,37,P,Legal,Kantor,2026-05-29,162,64,24.4,89,120,78,86,98,90,5.4,186,56,110,100,20,23,0.7,108,4.2,normal,normal,normal,cedera_lutut,tidak_ada,tidak_ada,tidak_ada,tidak
+EMP021,Karyawan 021,40,L,Marine,Lapangan,2026-05-30,174,74,24.4,98,126,80,78,97,94,5.5,190,48,116,135,26,31,1.0,96,5.7,normal,normal,mild_obstructive,asma,asma,inhaler_prn,debu,aktif
+EMP022,Karyawan 022,49,L,Security,Shift,2026-05-31,168,69,24.4,94,136,86,76,98,108,6.1,226,38,154,185,36,46,1.1,86,7.0,normal,normal,normal,kolesterol_tinggi,jantung,atorvastatin,tidak_ada,pernah
+EMP023,Karyawan 023,54,P,Finance,Kantor,2026-06-01,156,60,24.7,92,144,88,78,98,116,6.4,212,46,138,165,24,28,0.9,92,5.6,normal,normal,normal,hipertensi;prediabetes,diabetes,amlodipine,tidak_ada,tidak
+EMP024,Karyawan 024,35,L,Engineering,Kantor,2026-06-02,180,80,24.7,96,122,78,74,98,93,5.4,192,45,124,145,29,37,1.0,96,6.0,normal,normal,normal,GERD,tidak_ada,omeprazole_prn,pedas,tidak
+EMP025,Karyawan 025,31,L,IT,Kantor,2026-06-03,170,76,26.3,98,126,82,80,98,96,5.5,210,42,138,172,34,44,1.0,96,6.8,normal,normal,normal,tidak_ada,hipertensi,tidak_ada,tidak_ada,tidak
+EMP026,Karyawan 026,29,P,Admin,Kantor,2026-06-04,158,65,26.0,94,118,76,82,99,90,5.3,184,52,108,125,21,24,0.7,110,4.7,normal,normal,normal,tidak_ada,tidak_ada,tidak_ada,tidak_ada,tidak
+EMP027,Karyawan 027,44,L,Refinery Unit,Lapangan,2026-06-05,175,86,28.1,103,132,84,78,98,100,5.7,218,40,146,190,38,52,1.1,88,7.4,normal,normal,normal,tidak_ada,diabetes,tidak_ada,tidak_ada,pernah
+EMP028,Karyawan 028,39,P,HR,Kantor,2026-06-06,160,73,28.5,99,124,80,84,98,92,5.4,196,46,124,150,25,30,0.8,102,5.3,normal,normal,normal,tidak_ada,tidak_ada,tidak_ada,tidak_ada,tidak
+EMP029,Karyawan 029,33,L,Pipeline,Lapangan,2026-06-07,168,78,27.6,100,128,82,76,98,94,5.5,204,44,132,160,31,40,1.0,96,6.5,normal,normal,normal,tidak_ada,hipertensi,tidak_ada,tidak_ada,aktif
+EMP030,Karyawan 030,51,L,Operations,Lapangan,2026-06-08,170,82,28.4,108,152,94,78,97,112,6.3,230,38,158,210,42,56,1.2,78,7.8,normal,normal,normal,hipertensi,hipertensi;jantung,amlodipine,tidak_ada,pernah
+EMP031,Karyawan 031,55,P,Admin,Kantor,2026-06-09,155,72,30.0,105,138,86,76,98,136,7.8,220,46,142,182,30,36,0.9,86,5.9,normal,normal,normal,diabetes,diabetes,metformin,tidak_ada,tidak
+EMP032,Karyawan 032,48,L,Maintenance,Lapangan,2026-06-10,172,91,30.8,111,146,90,80,97,118,6.5,238,36,165,220,44,62,1.1,84,8.8,normal,normal,normal,hipertensi;asam_urat,hipertensi,amlodipine;allopurinol,seafood,aktif
+EMP033,Karyawan 033,46,P,HSE,Kantor,2026-06-11,160,79,30.9,103,132,84,84,98,102,5.8,232,39,156,200,36,48,1.0,90,5.4,normal,normal,normal,kolesterol_tinggi;cedera_lutut,jantung,atorvastatin,tidak_ada,tidak
+EMP034,Karyawan 034,58,L,Marine,Lapangan,2026-06-12,168,88,31.2,110,134,86,82,96,98,5.6,200,45,128,160,29,34,1.0,88,6.1,normal,normal,mild_obstructive,asma,asma,inhaler_prn,debu,pernah
+EMP035,Karyawan 035,53,L,Refinery Unit,Lapangan,2026-06-13,173,94,31.4,115,148,92,78,98,108,6.1,226,40,150,210,55,74,1.3,62,7.2,borderline,normal,normal,penyakit_ginjal;hipertensi,hipertensi,amlodipine,tidak_ada,tidak
+EMP036,Karyawan 036,57,P,Finance,Kantor,2026-06-14,156,78,32.1,108,150,92,82,98,130,7.4,240,38,166,225,34,42,1.0,80,6.0,normal,normal,normal,hipertensi;diabetes,diabetes;jantung,amlodipine;metformin,tidak_ada,tidak
+EMP037,Karyawan 037,60,L,Security,Shift,2026-06-15,170,98,33.9,118,156,96,84,97,106,6.0,218,42,140,190,32,44,1.1,82,6.7,old_infarct_suspect,normal,normal,penyakit_jantung,jantung,bisoprolol;aspirin,tidak_ada,pernah
+EMP038,Karyawan 038,28,P,Admin,Kantor,2026-06-16,162,47,17.9,68,108,68,82,99,82,5.0,158,62,82,70,18,20,0.7,112,3.6,normal,normal,normal,tidak_ada,tidak_ada,tidak_ada,tidak_ada,tidak
+EMP039,Karyawan 039,35,L,IT,Kantor,2026-06-17,176,56,18.1,74,116,74,78,98,86,5.1,164,56,90,80,21,24,0.9,108,4.8,normal,normal,normal,tidak_ada,tidak_ada,tidak_ada,tidak_ada,tidak
+EMP040,Karyawan 040,42,P,HR,Kantor,2026-06-18,158,45,18.0,70,110,70,86,99,84,5.1,170,58,96,85,20,22,0.7,106,4.0,normal,normal,normal,anemia,tidak_ada,zat_besi,tidak_ada,tidak
